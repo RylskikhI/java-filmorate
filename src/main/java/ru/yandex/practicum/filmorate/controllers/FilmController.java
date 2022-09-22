@@ -15,15 +15,15 @@ import java.util.Map;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final Map<String, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
     LocalDate releaseDate = LocalDate.of(1895, 12, 28);
 
     @PostMapping
     public Film addMovie(@RequestBody Film film) {
         log.info("Добавляем фильм {}", film);
-        /*if(film.getName().isBlank() && film.getName().isEmpty()) {
+        if(film.getName().isBlank() && film.getName().isEmpty()) {
             throw new ValidationException("Название фильма не может быть пустым.");
-        }*/
+        }
         if(film.getDuration() < 0) {
             throw new ValidationException("Продолжительность фильма не может быть меньше нуля или равняться ему.");
         }
@@ -33,7 +33,7 @@ public class FilmController {
         if(film.getReleaseDate().isBefore(releaseDate)) {
             throw new ValidationException("Дата релиза не должна быть ранее 28 декабря 1895 года");
         }
-        films.put(film.getName(), film);
+        films.put(film.getId(), film);
         return film;
     }
 
@@ -43,7 +43,7 @@ public class FilmController {
         if(film.getId() < 0) {
             throw new ValidationException("Идентификатор фильма не может быть отрицательным");
         }
-        films.put(film.getName(), film);
+        films.put(film.getId(), film);
         return film;
     }
 
