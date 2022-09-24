@@ -1,11 +1,10 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,14 +16,18 @@ import java.util.Map;
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
     LocalDate releaseDate = LocalDate.of(1895, 12, 28);
+    private int idGenerator = 1;
 
     @PostMapping
     public Film addMovie(@RequestBody Film film) {
         log.info("Добавляем фильм {}", film);
+        if(film.getId() == null) {
+            film.setId(idGenerator++);
+        }
         if(film.getName().isBlank() && film.getName().isEmpty()) {
             throw new ValidationException("Название фильма не может быть пустым.");
         }
-        if(film.getDuration() < 0) {
+        if(film.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма не может быть меньше нуля или равняться ему.");
         }
         if(film.getDescription().length() > 200) {
