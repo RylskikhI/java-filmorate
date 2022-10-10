@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.exception;
 
-public class ValidationException  extends RuntimeException {
+public class UserNotFoundException extends RuntimeException {
 
     private final String path;
 
-    public ValidationException(String message, String path) {
+    public UserNotFoundException(String message, String path) {
         super(message);
         this.path = path;
     }
@@ -13,3 +13,7 @@ public class ValidationException  extends RuntimeException {
         return path;
     }
 }
+
+
+
+

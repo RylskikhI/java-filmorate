@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.exception;
 
-public class ValidationException  extends RuntimeException {
+public class FilmNotFoundException extends RuntimeException{
 
     private final String path;
 
-    public ValidationException(String message, String path) {
+    public FilmNotFoundException(String message, String path) {
         super(message);
         this.path = path;
     }
