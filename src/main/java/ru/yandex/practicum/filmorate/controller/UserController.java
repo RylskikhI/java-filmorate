@@ -42,15 +42,15 @@ public class UserController {
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Обновляем данные пользователя {}", user);
-        if (userStorage.getUser(user.getId()) == null) {
-            log.warn("Пользователь с id " + user.getId() + " не найден. Данные не обновлены!");
-            throw new UserNotFoundException("Пользователь с id " + user.getId()
+        if (userStorage.getUser(user.getUserId()) == null) {
+            log.warn("Пользователь с id " + user.getUserId() + " не найден. Данные не обновлены!");
+            throw new UserNotFoundException("Пользователь с id " + user.getUserId()
                     + " не найден. Данные не обновлены!", "PUT/users");
         }
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
         }
-        if (userStorage.getUser(user.getId()) != null && validationUser(user)) {
+        if (userStorage.getUser(user.getUserId()) != null && validationUser(user)) {
             userStorage.updateUser(user);
             log.info("Данные пользователя обновлены " + user);
         } else {

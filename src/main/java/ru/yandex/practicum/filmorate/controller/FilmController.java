@@ -44,8 +44,8 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Обновляем фильм {}", film);
-        if (filmStorage.getFilm(film.getId()) == null) {
-            log.warn("Фильм c id " + film.getId() + " не найден. Данные не обновлены");
+        if (filmStorage.getFilm(film.getFilmId()) == null) {
+            log.warn("Фильм c id " + film.getFilmId() + " не найден. Данные не обновлены");
             throw new FilmNotFoundException("Фильм не найден. Данные не обновлены!", "PUT/films");
         }
         if (validationFilm(film)) {
