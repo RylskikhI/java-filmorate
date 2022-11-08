@@ -2,7 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -14,46 +18,63 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendshipDao friendshipDao;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendshipDao friendshipDao) {
         this.userStorage = userStorage;
+        this.friendshipDao = friendshipDao;
     }
 
-    public User addFriend(long userId, long friendId) {
-        User user = userStorage.getUser(userId);
-        User friend = userStorage.getUser(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        return friend;
-    }
-
-    public User deleteFriend(long userId, long friendId) {
-        User user = userStorage.getUser(userId);
-        User friend = userStorage.getUser(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        return user;
-    }
-
-    public List<User> getUserFriends(long userId) {
-        Set<Long> userFriendsId = userStorage.getUser(userId).getFriends();
-        List<User> userFriends = new ArrayList<>();
-        userFriendsId.forEach(t -> userFriends.add(userStorage.getUser(t)));
-        return userFriends;
-    }
-
-    public List<User> getUsersCommonFriends(long userId, long otherUserId) {
-        Set<Long> commonFriendsIds;
-        if (userStorage.getUser(userId).getFriends() != null) {
-            commonFriendsIds = userStorage.getUser(userId).getFriends().stream()
-                    .filter(p2 -> userStorage.getUser(otherUserId).getFriends().contains(p2))
-                    .collect(Collectors.toSet());
+    public void addFriend(long userId1, long userId2) {
+        Friendship friendship = friendshipDao.get(userId2, userId1);
+        if (friendship == null) {
+            friendship = friendshipDao.get(userId1, userId2);
+            if (friendship == null) {
+                friendshipDao.create(userId1, userId2);
+            }
         } else {
-            commonFriendsIds = Collections.EMPTY_SET;
+            if (!friendship.isAccepted()) {
+                friendshipDao.update(userId2, userId1, true);
+            }
         }
-        List<User> commonFriends = new ArrayList<>();
-        commonFriendsIds.forEach(t -> commonFriends.add(userStorage.getUser(t)));
-        return commonFriends;
+    }
+
+    public void deleteFriend(long userId1, long userId2) {
+        Friendship friendship = friendshipDao.get(userId2, userId1);
+        if (friendship == null) {
+            friendship = friendshipDao.get(userId1, userId2);
+            if (friendship == null) {
+                throw new FriendshipNotFoundException();
+            }
+            friendshipDao.remove(userId1, userId2);
+            friendshipDao.create(userId2, userId1);
+        } else {
+            friendshipDao.update(userId2, userId1, false);
+        }
+    }
+
+    public List<User> getUserFriends(long id) {
+        return friendshipDao.getByUserId(id).stream()
+                .map(friendship -> getFriedFromFriendship(friendship, id))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getUsersCommonFriends(long userId1, long userId2) {
+        Set<User> friendsOfUser1 = new HashSet<>(getUserFriends(userId1));
+        Set<User> friendsOfUser2 = new HashSet<>(getUserFriends(userId2));
+        friendsOfUser1.retainAll(friendsOfUser2);
+        return new ArrayList<>(friendsOfUser1);
+    }
+
+    private User getFriedFromFriendship(Friendship friendship, long userId) {
+        if (friendship.getActiveUserId() == userId) {
+            return userStorage.getUser(friendship.getPassiveUserId());
+        } else if (friendship.isAccepted()) {
+            return userStorage.getUser(friendship.getActiveUserId());
+        } else {
+            return null;
+        }
     }
 }

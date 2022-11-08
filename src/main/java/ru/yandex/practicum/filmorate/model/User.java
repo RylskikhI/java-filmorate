@@ -1,26 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Set;
 
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
-
-    @NonNull
-    private long userId;
-    @Email(message = "Некорректный формат email")
+    private long id;
+    @Email
+    @NotNull
     private String email;
-    @NonNull
+    @NotNull
+    @NotBlank
     private String login;
     private String name;
+    @Past
+    @NotNull
     private LocalDate birthday;
-    private String status;
-    private Set<Long> friends;
-
 }

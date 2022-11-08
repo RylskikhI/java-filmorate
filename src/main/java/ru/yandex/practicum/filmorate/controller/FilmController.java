@@ -20,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/films")
-
 public class FilmController {
 
     private final FilmStorage filmStorage;
@@ -30,7 +29,6 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         log.info("Добавляем фильм {}", film);
-
         if (validationFilm(film)) {
             filmStorage.addFilm(film);
             log.info("Фильм добавлен");
@@ -43,19 +41,9 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        log.info("Обновляем фильм {}", film);
-        if (filmStorage.getFilm(film.getFilmId()) == null) {
-            log.warn("Фильм c id " + film.getFilmId() + " не найден. Данные не обновлены");
-            throw new FilmNotFoundException("Фильм не найден. Данные не обновлены!", "PUT/films");
-        }
-        if (validationFilm(film)) {
-            filmStorage.updateFilm(film);
-            log.info("Фильм обновлен");
-        } else {
-            log.warn("Фильм не обновлен!");
-            throw new ValidationException("Проверьте корректность введенных данных", "PUT/films");
-        }
-        return film;
+        log.info("/films (PUT): {}", film);
+        validationFilm(film);
+        return filmService.updateFilm(film);
     }
 
     @GetMapping
@@ -66,11 +54,11 @@ public class FilmController {
 
     @GetMapping("/{filmId}")
     public Film getFilm(@PathVariable long filmId) {
-        Film film = filmStorage.getFilm(filmId);
+        Film film = filmStorage.get(filmId);
         if (film != null) {
-            return filmStorage.getFilm(filmId);
+            return filmStorage.get(filmId);
         } else {
-            throw new FilmNotFoundException("Фильм с id " + filmId + " не найден", "GET/films/"+filmId);
+            throw new FilmNotFoundException();
         }
     }
 
@@ -81,17 +69,15 @@ public class FilmController {
 
     @PutMapping("/{filmId}/like/{userId}")
     public void addLike(@PathVariable long filmId, @PathVariable long userId) {
-        Film film = filmStorage.getFilm(filmId);
+        Film film = filmStorage.get(filmId);
         User user = userStorage.getUser(userId);
 
         log.info("Добавляем лайк для фильма " + filmId + " от пользователя " + userId);
         if (film == null) {
-            throw new FilmNotFoundException("Фильм c id " + filmId + " не найден!", "PUT/films/" + filmId
-                    + "/like/" + userId);
+            throw new FilmNotFoundException();
         }
         if (user == null) {
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден", "PUT/films/"
-                    + filmId + "/like/" + userId);
+            throw new UserNotFoundException();
         }
         filmService.addLike(filmId, userId);
         log.info("Лайк добавлен");
@@ -99,17 +85,15 @@ public class FilmController {
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike(@PathVariable long filmId, @PathVariable long userId) {
-        Film film = filmStorage.getFilm(filmId);
+        Film film = filmStorage.get(filmId);
         User user = userStorage.getUser(userId);
 
         log.info("Удаляем лайк у фильма " + filmId + " от пользователя " + userId);
         if (film == null) {
-            throw new FilmNotFoundException("Фильм c id " + filmId + " не найден!", "DELETE/films/"
-                    + filmId + "/like/" + userId);
+            throw new FilmNotFoundException();
         }
         if (user == null) {
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден", "DELETE/films/"
-                    + filmId + "/like/" + userId);
+            throw new UserNotFoundException();
         }
         filmService.removeLike(filmId, userId);
         log.info("Лайк удален");
@@ -118,7 +102,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10", required = false) int count) {
         log.info("Запрошен список фильмов с наибольшим количеством лайков");
-        return filmService.getTopFilms(count);
+        return filmService.getPopularFilms(count);
     }
 
     private boolean validationFilm(Film film) {

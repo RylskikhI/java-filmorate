@@ -26,9 +26,6 @@ public class UserController {
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
         if (validationUser(user)) {
             userStorage.createUser(user);
             log.info("Добавлен пользователь " + user);
@@ -42,15 +39,11 @@ public class UserController {
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Обновляем данные пользователя {}", user);
-        if (userStorage.getUser(user.getUserId()) == null) {
-            log.warn("Пользователь с id " + user.getUserId() + " не найден. Данные не обновлены!");
-            throw new UserNotFoundException("Пользователь с id " + user.getUserId()
-                    + " не найден. Данные не обновлены!", "PUT/users");
+        if (userStorage.getUser(user.getId()) == null) {
+            log.warn("Пользователь с id " + user.getId() + " не найден. Данные не обновлены!");
+            throw new UserNotFoundException();
         }
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
-        if (userStorage.getUser(user.getUserId()) != null && validationUser(user)) {
+        if (userStorage.getUser(user.getId()) != null && validationUser(user)) {
             userStorage.updateUser(user);
             log.info("Данные пользователя обновлены " + user);
         } else {
@@ -66,16 +59,16 @@ public class UserController {
         return userStorage.findAllUsers();
     }
 
-    @GetMapping("/{userId}")
-    public User getUser(@PathVariable long userId) {
-        log.info("Запрошен пользователь с id" + userId);
-        User user = userStorage.getUser(userId);
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable long id) {
+        log.info("Запрошен пользователь с id" + id);
+        User user = userStorage.getUser(id);
         if (user != null) {
             log.info("Пользователь найден " + user);
-            return userStorage.getUser(userId);
+            return userStorage.getUser(id);
         } else {
-            log.warn("Пользователь с id " + userId + " не найден");
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден","GET/users/"+userId);
+            log.warn("Пользователь с id " + id + " не найден");
+            throw new UserNotFoundException();
         }
     }
 
@@ -96,8 +89,7 @@ public class UserController {
                 log.warn("Пользователь с id " + otherUserId + " не найден. ");
                 response.append("Пользователь с id ").append(otherUserId).append("не найден. ");
             }
-            throw new UserNotFoundException(response.toString(), "GET/users/"
-                    + userId + "/friends/common/" + otherUserId);
+            throw new UserNotFoundException();
         }
         return userService.getUsersCommonFriends(userId, otherUserId);
     }
@@ -119,7 +111,7 @@ public class UserController {
                 log.warn(("Друг с id " + friendId + " не найден. "));
                 response.append("Друг с id " + friendId + " не найден. ");
             }
-            throw new UserNotFoundException(response.toString(), "PUT/users/" + userId + "/friends/" + friendId);
+            throw new UserNotFoundException();
         }
         userService.addFriend(userId, friendId);
         log.info("Пользователь " + userId + " добавил в друзья " + friendId);
@@ -127,17 +119,33 @@ public class UserController {
 
     @DeleteMapping("/{userId}/friends/{friendId}")
     public void deleteFriend(@PathVariable long userId, @PathVariable long friendId) {
+        User user = userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
+
+        log.info("Пользователем " + userId + " запрошено удаление из друзей пользователя " + friendId);
+
+        if (user == null || friend == null) {
+            StringBuilder response = new StringBuilder();
+
+            if (user == null) {
+                log.warn("Пользователь с ID " + userId + "не найден. ");
+                response.append("Пользователь с ID ").append(userId).append("не найден. ");
+            }
+            if (friend == null) {
+                log.warn("Друг с ID " + friendId + " не найден. ");
+                response.append("Друг с ID ").append(friendId).append(" не найден. ");
+            }
+            throw new UserNotFoundException();
+        }
         userService.deleteFriend(userId, friendId);
         log.info("Пользователь " + userId + " удалил из друзей " + friendId);
-
     }
 
     @GetMapping("/{userId}/friends")
     public List<User> getUserFriends(@PathVariable long userId) {
         log.info("Запрошен список друзей пользователя c id " + userId);
         if (userStorage.getUser(userId) == null) {
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден","GET/users/"
-                    + userId + "/friends");
+            throw new UserNotFoundException();
         }
         return userService.getUserFriends(userId);
     }

@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 @Component
+
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
 
@@ -18,14 +16,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        film.setFilmId(++idGenerator);
-        film.setLikes(new HashSet<>());
-        films.put(film.getFilmId(), film);
+        film.setId(++idGenerator);
+        /*film.setLikes(new HashSet<>());*/
+        films.put(film.getId(), film);
         return film;
     }
 
     @Override
-    public Film getFilm(Long filmId) {
+    public Film get(long filmId) {
         return films.get(filmId);
     }
 
@@ -36,15 +34,20 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        if (film.getLikes() == null) {
+        /*if (film.getLikes() == null) {
             film.setLikes(new HashSet<>());
-        }
-        films.put(film.getFilmId(), film);
+        }*/
+        films.put(film.getId(), film);
         return film;
     }
 
     @Override
     public void deleteFilm(Film film) {
         films.remove(film);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int size) {
+        return null;
     }
 }

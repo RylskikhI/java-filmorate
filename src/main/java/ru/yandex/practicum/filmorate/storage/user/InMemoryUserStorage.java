@@ -15,14 +15,14 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) throws ValidationException {
-        user.setUserId(++idGenerator);
-        users.put(user.getUserId(), user);
+        user.setId(++idGenerator);
+        users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User getUser(Long userId) {
-        return users.get(userId);
+    public User getUser(long id) {
+        return users.get(id);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        users.put(user.getUserId(), user);
+        users.put(user.getId(), user);
         return user;
     }
 

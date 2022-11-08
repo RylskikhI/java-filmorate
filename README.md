@@ -6,42 +6,36 @@ ER-диаграмма для проекта
 
 1. Получение всех фильмов:
 
-   `SELECT * FROM film`
+   ```SELECT * FROM film```
         
 2. Получение всех пользователей:
 
-   `SELECT * FROM user`
+   ```SELECT * FROM user```
        
-3. Получение 10 самых популярных фильмов:
+3. Получение любимых жанров пользователя с id1:
 
    ```
-   SELECT
-   f.film_id as film_id,
-   f.title as title,
-   COUNT(uf.user_id) as top
-   FROM film AS f
-   INNER JOIN user_films uf ON uf.film_id = f.film_id
-   GROUP BY
-   film_id,
-   title
-   ORDER BY top DESC
-   LIMIT 10;
+   SELECT g.name, COUNT(*)
+   FROM films AS f
+   JOIN likes AS l ON f.id = l.film_id
+   JOIN film_genres AS fg ON f.id = fg.film_id
+   JOIN genres AS g ON fg.genre_id = g.id
+   WHERE l.user_id = [id1]
+   GROUP BY g.name
+   ORDER BY COUNT(*) DESC;
    ```
 
-4. Список общих друзей:
+4. Получение топ-10 популярных фильмов:
    
    ```
-   SELECT
-   uf.friend_id
-   FROM user_friends AS uf
-   WHERE uf.user_id = 1 -- ID первого пользователя
-   AND uf.friendship_id = 1 -- 1 означает подтвержденный статус
-   AND uf.friend_id IN (
-   SELECT friend_id
-   FROM user_friends uf1
-   WHERE uf1.user_id = 2 -- ID второго пользователя
-   uf1.friendship_id = 1 -- 1 означает подтвержденный статус
-   )
+   SELECT f.id, f.NAME, COUNT(*)
+   FROM films AS f
+   LEFT JOIN likes AS l ON f.id = l.film_id
+   GROUP BY f.name
+   ORDER BY
+   CASE WHEN l.film_id IS NULL THEN 1 ELSE 0 END,
+   COUNT(*) DESC
+   LIMIT 10;
    ```
 
       
