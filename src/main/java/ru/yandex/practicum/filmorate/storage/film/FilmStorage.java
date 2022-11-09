@@ -12,7 +12,6 @@ public interface FilmStorage {
     Film updateFilm(Film film);
     Film get(long filmId);
     Collection<Film> findAllFilms();
-    void deleteFilm(Film film);
     List<Film> getPopularFilms(int size);
 
 

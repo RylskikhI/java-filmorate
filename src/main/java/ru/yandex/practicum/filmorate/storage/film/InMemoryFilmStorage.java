@@ -17,7 +17,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         film.setId(++idGenerator);
-        /*film.setLikes(new HashSet<>());*/
         films.put(film.getId(), film);
         return film;
     }
@@ -34,16 +33,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        /*if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }*/
         films.put(film.getId(), film);
         return film;
-    }
-
-    @Override
-    public void deleteFilm(Film film) {
-        films.remove(film);
     }
 
     @Override

@@ -45,10 +45,9 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         String sqlQuery = "INSERT INTO films " +
-                "(name, description, release_date, duration, mpa, rate)\n" +
-                "VALUES (?, ?, ?, ?, ?, ?);";
+                "(name, description, release_date, duration, mpa, rate) VALUES (?, ?, ?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update((connection) -> {
+        jdbcTemplate.update(connection -> {
             PreparedStatement ps =
                     connection.prepareStatement(sqlQuery, new String[] {"id"});
             ps.setString(1, film.getName());
@@ -68,8 +67,7 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE films SET name = ?, description = ?, " +
-                "release_date = ?, mpa = ?, rate = ?, duration = ?" +
-                "WHERE id = ?";
+                "release_date = ?, mpa = ?, rate = ?, duration = ? WHERE id = ?";
         int amountOfUpdated = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getMpa().getId(), film.getRate(),
                 film.getDuration(), film.getId());
@@ -98,11 +96,6 @@ public class DbFilmStorage implements FilmStorage {
     public Collection<Film> findAllFilms() {
         String sqlQuery = "SELECT * FROM films;";
         return jdbcTemplate.query(sqlQuery, (resultSet, rowId) -> buildFilm(resultSet));
-    }
-
-    @Override
-    public void deleteFilm(Film film) {
-
     }
 
     private Film buildFilm(ResultSet resultSet) throws SQLException {
@@ -137,14 +130,9 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     public List<Film> getPopularFilms(int size) {
-        String sqlQuery = "SELECT f.id \n" +
-                "FROM films AS f \n" +
-                "LEFT JOIN likes AS l ON f.id = l.film_id \n" +
-                "GROUP BY f.name \n" +
-                "ORDER BY \n" +
-                "    CASE WHEN l.film_id IS NULL THEN 1 ELSE 0 END, \n" +
-                "    COUNT(*) DESC \n" +
-                "LIMIT ?;";
+        String sqlQuery = "SELECT f.id FROM films AS f LEFT JOIN likes AS l ON f.id = l.film_id GROUP BY f.name " +
+                "ORDER BY CASE WHEN l.film_id IS NULL THEN 1 ELSE 0 END, COUNT(*) DESC LIMIT ?;";
+
         List<Integer> popularFilmIds = jdbcTemplate.queryForList(sqlQuery, Integer.class, size);
         return popularFilmIds.stream()
                 .map(this::get)

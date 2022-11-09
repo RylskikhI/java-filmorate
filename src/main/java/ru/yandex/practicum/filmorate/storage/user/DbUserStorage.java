@@ -32,10 +32,9 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        String sqlQuery = "INSERT INTO users (email, login, name, birthday) \n" +
-                "VALUES (?, ?, ?, ?);";
+        String sqlQuery = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update((connection) -> {
+        jdbcTemplate.update(connection -> {
             PreparedStatement ps =
                     connection.prepareStatement(sqlQuery, new String[] {"id"});
             ps.setString(1, user.getEmail());
@@ -51,8 +50,7 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User getUser(long userId) {
-        String sqlQuery = "SELECT id, email, login, name, birthday FROM users \n" +
-                "WHERE id = ?;";
+        String sqlQuery = "SELECT id, email, login, name, birthday FROM users WHERE id = ?;";
         List<User> users = jdbcTemplate.query(sqlQuery,
                 (resultSet, rowId) -> buildUser(resultSet), userId);
         if (users.isEmpty()) {
@@ -69,17 +67,10 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        String sqlQuery = "UPDATE users \n" +
-                "SET email = ?, login = ?, name = ?, birthday = ? \n" +
-                "WHERE id = ?;";
+        String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?;";
         jdbcTemplate.update(sqlQuery, user.getEmail(), user.getLogin(),
                 user.getName(), user.getBirthday(), user.getId());
         return getUser(user.getId());
-    }
-
-    @Override
-    public void deleteUser(User user) {
-
     }
 
     private User buildUser(ResultSet resultSet) throws SQLException {
