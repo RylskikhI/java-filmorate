@@ -58,13 +58,25 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable long id) {
-        log.info("Запрошен пользователь с id" + id);
+        log.info("Запрошен пользователь с id " + id);
         User user = userStorage.getUser(id);
         if (user != null) {
             log.info("Пользователь найден " + user);
             return userStorage.getUser(id);
         } else {
             throw new UserNotFoundException("Пользователь с id " + id + " не найден");
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable long userId) {
+        log.info("Запрошено удаление пользователя с id " + userId);
+        User user = userStorage.getUser(userId);
+        if (user != null) {
+            log.info("Удаляем пользователя " + user.getLogin());
+            userStorage.deleteUser(userId);
+        } else {
+            throw new UserNotFoundException("Пользователь с id " + userId + " не найден");
         }
     }
 

@@ -62,6 +62,18 @@ public class FilmController {
         }
     }
 
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable long filmId) {
+        log.info("Запрошено удаление фильма с id " + filmId);
+        Film film = filmStorage.get(filmId);
+        if (film != null) {
+            log.info("Удаляем фильм " + film.getName());
+            userStorage.deleteUser(filmId);
+        } else {
+            throw new FilmNotFoundException(filmId);
+        }
+    }
+
     @PutMapping("/{filmId}/like/{userId}")
     public void addLike(@PathVariable long filmId, @PathVariable long userId) {
         Film film = filmStorage.get(filmId);

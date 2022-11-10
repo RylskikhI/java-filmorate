@@ -1,6 +1,6 @@
 #FileLock
-#Wed Nov 09 12:27:45 CST 2022
+#Thu Nov 10 07:10:04 CST 2022
 hostName=WIN-FTCB24MGUCR
-id=1845da5e8cfd7215d5a3366631db9acdca1821ad16f
+id=18461a96dc14fc30ac2952fc75701dd5bf2579965bd
 method=file
-server=192.168.100.10\:59591
+server=192.168.100.10\:54619

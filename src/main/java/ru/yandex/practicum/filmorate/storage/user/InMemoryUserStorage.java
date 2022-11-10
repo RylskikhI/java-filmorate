@@ -35,4 +35,9 @@ public class InMemoryUserStorage implements UserStorage {
         users.put(user.getId(), user);
         return user;
     }
+
+    @Override
+    public void deleteUser(long userId) {
+        users.remove(userId);
+    }
 }

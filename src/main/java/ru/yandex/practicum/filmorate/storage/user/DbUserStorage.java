@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -71,6 +72,16 @@ public class DbUserStorage implements UserStorage {
         jdbcTemplate.update(sqlQuery, user.getEmail(), user.getLogin(),
                 user.getName(), user.getBirthday(), user.getId());
         return getUser(user.getId());
+    }
+
+    @Override
+    public void deleteUser(long userId) {
+        String sqlQuery = "DELETE FROM users WHERE id = ?;";
+
+        int amountOfDeleted = jdbcTemplate.update(sqlQuery, userId);
+        if (amountOfDeleted != 1) {
+            throw new UserNotFoundException();
+        }
     }
 
     private User buildUser(ResultSet resultSet) throws SQLException {

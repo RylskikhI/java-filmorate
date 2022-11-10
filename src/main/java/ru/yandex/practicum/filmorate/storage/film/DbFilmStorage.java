@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.dao.FilmGenreDao;
 import ru.yandex.practicum.filmorate.dao.GenresDao;
 import ru.yandex.practicum.filmorate.dao.MpaDao;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmGenres;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -137,5 +138,16 @@ public class DbFilmStorage implements FilmStorage {
         return popularFilmIds.stream()
                 .map(this::get)
                 .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Override
+    public void deleteFilm(long filmId) {
+        String sqlQuery = "DELETE FROM films WHERE id = ?;";
+
+        int amountOfDeleted = jdbcTemplate.update(sqlQuery, filmId);
+        if (amountOfDeleted != 1) {
+            throw new FilmNotFoundException();
+        }
+
     }
 }
