@@ -4,11 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class FilmNotFoundException extends RuntimeException {
-    public FilmNotFoundException() {
+public class FriendshipNotFoundException extends RuntimeException {
+    public FriendshipNotFoundException() {
     }
 
-    public FilmNotFoundException(long id) {
-        super("Фильм не найден: id = " + id);
+    public FriendshipNotFoundException(String message) {
+        super(message);
     }
 }

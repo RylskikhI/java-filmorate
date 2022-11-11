@@ -21,19 +21,19 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final ValidationException e) {
-        return new ErrorResponse(e.getMessage(), e.getPath());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleIncorrectParameterException(final UserNotFoundException e) {
-        return new ErrorResponse(e.getMessage(), e.getPath());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleIncorrectParameterException(final FilmNotFoundException e) {
-        return new ErrorResponse(e.getMessage(), e.getPath());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

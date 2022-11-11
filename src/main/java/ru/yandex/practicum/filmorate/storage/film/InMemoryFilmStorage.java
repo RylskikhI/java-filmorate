@@ -2,17 +2,12 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 @Component
+
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
 
@@ -22,13 +17,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         film.setId(++idGenerator);
-        film.setLikes(new HashSet<>());
         films.put(film.getId(), film);
         return film;
     }
 
     @Override
-    public Film getFilm(Long filmId) {
+    public Film get(long filmId) {
         return films.get(filmId);
     }
 
@@ -39,15 +33,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
         films.put(film.getId(), film);
         return film;
     }
 
+    public void deleteFilm(long filmId) {
+        films.remove(filmId);
+    }
+
     @Override
-    public void deleteFilm(Film film) {
-        films.remove(film);
+    public List<Film> getPopularFilms(int size) {
+        return null;
     }
 }

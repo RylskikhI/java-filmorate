@@ -21,8 +21,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Long userId) {
-        return users.get(userId);
+    public User getUser(long id) {
+        return users.get(id);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUser(User user) {
-        users.remove(user);
+    public void deleteUser(long userId) {
+        users.remove(userId);
     }
 }
